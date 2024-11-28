@@ -1,0 +1,12 @@
+# Environnement virtuel
+venv/
+.env
+
+# Fichiers Django spécifiques
+*.pyc
+__pycache__/
+db.sqlite3
+
+# Fichiers système
+.DS_Store
+*.log

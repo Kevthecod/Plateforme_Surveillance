@@ -1,0 +1,103 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'assert/css/bootstrap.min.css' %}">
+    <title>Plateforme_surveilance</title>
+    <style>
+        .bg-image {
+          color: white;
+          background-image: url('{% static "image/image_poste.jpg" %}');
+          background-size: cover;
+          background-position: center;
+          background-repeat: no-repeat;
+          height: 100vh;
+          
+          position: relative;
+        }
+
+        .bg-image::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.6); /* Teinte foncée */
+          backdrop-filter: blur(px); /* Applique un flou */
+        }
+
+        .bg-image h1 , .description , .btn {
+          position: relative;
+          z-index: 1; /* Assure que le texte soit au-dessus du filtre */
+        }
+
+        .logo {
+          width: 50px;
+          height: 50px;
+        }
+
+        .description {
+          text-align: center;
+          font-size: 1.4rem;
+          font-weight: semibold;
+          color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluide">
+        <header class="d-flex justify-content-between align-items-center p-3 header color" style="background-color: rgba(69, 199, 243, 0.904); color: aliceblue;">
+            <div>
+                <img src="{% static 'image/Logo-SBEE.png' %}" alt="Logo SBEE" class="logo">
+            </div>
+            <div>
+                <h2 class="mb-0 title text-center">MONITORING DE TRANSFORMATEURS</h2>
+            </div>
+            <div>
+                <nav>
+                    <ul class="nav ">
+                        <li class="nav-item">
+                            <a class="nav-link text-white fs-5" href="#acceuil">Accueil</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white fs-5" href="#propos">À propos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white fs-5" href="#contact">Contact</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+        <section id="acceuil" class="container-fluid bg-image d-flex justify-content-center align-items-center text-center text-white mb-0">
+            <div class="text-center mt-3 ">
+                <h1 class="display-3 fw-semibold">Plateforme de surveillance des transformateurs de distributions</h1>
+                    <div class="d-flex justify-content-center align-items-center">
+                        <div id="propos" class="shadow p-3 mb-2 bg-transparent rounded" style="width: 60%;">
+                            <p class="description mx-2" >Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sunt commodi accusamus, odio quidem qui laudantium corporis aliquam libero ullam, at voluptatum nesciunt repellendus cumque iste. Reprehenderit neque deleniti id quaerat.</p>
+                        </div>
+                    </div>
+                    <a href="{% url 'login' %}" class="btn btn-success btn-lg">Commencer</a>
+            </div>
+        </section>
+
+    </div>
+    <footer class="fixed-bottom text-white">
+        <div class="row">
+            <div class="col bg-success p-1"></div>
+            <div class="col bg-warning"></div>
+            <div class="col bg-danger"></div>
+        </div>
+
+        <div class="text-center p-3" style="background-color:#313131;">
+            UAC-EPAC © 2024 Copyright DEV
+        </div>
+    </footer>
+    <script src="{% static 'assert/js/bootstrap.bundle.min.js' %}"></script>
+    <!-- <script src="{% static 'assert/js/script.js' %}"></script> -->
+    <script src="{% static 'assert/js/auth.js' %}"></script>
+</body>
+</html>

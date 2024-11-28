@@ -1,0 +1,64 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des départs</title>
+    <link rel="stylesheet" href="{% static 'assert/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assert/css/style.css' %}">
+</head>
+
+<body>
+    <div class="container-fluide">
+        <header class=" d-flex justify-content-between align-items-center p-3 mb-0 header">
+            <div>
+                <img src="{% static 'image/Logo-SBEE.png' %}" alt="Logo SBEE" class="logo">
+            </div>
+            <div>
+                <h2 class="mb-0 title text-center">INTERFACE DE SUPERVISION</h2>
+            </div>
+            <div>
+                <nav>
+                    <ul class="nav ">
+                        <li class="nav-item">
+                            <a class="nav-link text-white fs-5" href="{% url 'accueil' %}">Accueil</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white fs-5" href="#depart">départ</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <nav id ="sidebar">
+            <div class="hautsidebar">
+                <a href="#" id="liste-postes-toggle">Listes des postes sources</a>
+            </div>
+            <hr style="border: 3px solid rgb(7, 6, 6); margin: 5px 0;">
+            <div id="postes-list"></div>      
+        </nav>
+
+        <div class="main-content">
+            <section id ="post">
+                <div class="entete">
+                    
+                </div>
+            </section>
+        </div>
+    </div>        
+    <footer class="fixed-bottom text-white">
+        <div class="row">
+            <div class="col bg-success p-1"></div>
+            <div class="col bg-warning"></div>
+            <div class="col bg-danger"></div>
+        </div>
+        <div class="text-center p-3" style="background-color:#313131;">
+            UAC-EPAC © 2024 Copyright DEV
+        </div>
+    </footer>
+    <script src="{% static 'assert/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'assert/js/script_depart.js' %}"></script>
+</body>
+</html>
