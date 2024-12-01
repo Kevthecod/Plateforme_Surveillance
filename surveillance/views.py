@@ -5,11 +5,13 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib import messages
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
+from rest_framework.views import APIView
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
-from .models import PosteSource, Depart, Transformateur
-from .serializers import PosteSourceSerializer, DepartSerializer, TransformateurSerializer, CapteurSerializer
+from .models import HistoriqueDonnees, PosteSource, Depart, Transformateur
+from .serializers import PosteSourceSerializer, DepartSerializer, TransformateurSerializer, CapteurSerializer, DernieresDonneesSerializer
+
 
 
 def login_view(request):
@@ -87,42 +89,62 @@ def get_postes_data(request):
     
     return JsonResponse({'postes': data})
 
-@api_view(['POST'])
-def recevoir_donnees_esp32(request):
-    if request.method == 'POST':
-        # Affiche les données reçues pour le débogage
-        print("Données reçues :", request.data)
-        
-        serializer = CapteurSerializer(data=request.data)
-        if serializer.is_valid():
-            # Récupérer le code_poste
-            code_poste = serializer.validated_data.get('code_poste')
-            try:
-                # Vérifier si le transformateur existe
-                transformateur = Transformateur.objects.get(code_poste=code_poste)
-                
-                # Mettre à jour uniquement les champs envoyés par l'ESP32
-                transformateur.tension_secondaire = serializer.validated_data.get('tension_secondaire')
-                transformateur.courant_secondaire = serializer.validated_data.get('courant_secondaire')
-                transformateur.temperature = serializer.validated_data.get('temperature')
-                transformateur.niveau_huile = serializer.validated_data.get('niveau_huile')
-                transformateur.save()
-                
-                return Response(
-                    {"message": "Données mises à jour avec succès."},
-                    status=status.HTTP_200_OK
-                )
-            except Transformateur.DoesNotExist:
-                # Si le code_poste n'existe pas
-                return Response(
-                    {"error": "Le code_poste spécifié n'existe pas."},
-                    status=status.HTTP_404_NOT_FOUND
-                )
-        else:
-            # Affiche les erreurs de validation pour le débogage
-            print("Erreurs du serializer :", serializer.errors)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+def verifier_anomalies(data):
+    anomalies = []
+    
+    if data.get('temperature') > 70:
+        anomalies.append("Température élevée (> 70°C).")
+    if data.get('niveau_huile') < 20:
+        anomalies.append("Faible niveau d'huile (< 20%).")
+    if data.get('pression_interne') < 210 or data.get('pression_interne') > 250:
+        anomalies.append("Tension secondaire hors plage normale (210-250 V).")
+    for phase in ['I1', 'I2', 'I3']:
+        if data.get(f'courant_secondaire_{phase}') > 50:  # Exemple : seuil de 50 A
+            anomalies.append(f"Courant secondaire {phase} élevé (> 50 A).")
+    
+    alerte = len(anomalies) > 0
+    message = " | ".join(anomalies) if anomalies else None
+    
+    return alerte, message
 
-    # Retour si ce n'est pas une requête POST
-    return Response({"error": "Méthode non autorisée."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+class RecevoirDonneesAPIView(APIView):
+    
+    def post(self, request, *args, **kwargs):
+        # Récupérer les données envoyées
+        data = request.data
+
+        if not all(key in data for key in ['code_poste', 'pression_interne', 'courant_secondaire_I1', 'courant_secondaire_I2', 'courant_secondaire_I3', 'temperature', 'niveau_huile']):
+            return Response(
+                {"detail": "Données manquantes dans la requête."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        
+        try:
+            # Vérifier si le transformateur existe
+            transformateur = Transformateur.objects.get(code_poste=data.get('code_poste'))
+        except Transformateur.DoesNotExist:
+            return Response(
+                {"detail": "Transformateur introuvable avec ce code_poste."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        alerte, message = verifier_anomalies(data)
+        # Enregistrer les données dans HistoriqueDonnees
+        HistoriqueDonnees.objects.create(
+            transformateur=transformateur,
+            pression_interne=data.get('pression_interne'),
+            courant_secondaire_I1=data.get('courant_secondaire_I1'),
+            courant_secondaire_I2=data.get('courant_secondaire_I2'),
+            courant_secondaire_I3=data.get('courant_secondaire_I3'),
+            temperature=data.get('temperature'),
+            niveau_huile=data.get('niveau_huile'),
+            alerte=alerte,
+            message=message
+        )
+
+        return Response(
+            {"detail": "Données enregistrées avec succès."},
+            status=status.HTTP_201_CREATED
+        )
 
