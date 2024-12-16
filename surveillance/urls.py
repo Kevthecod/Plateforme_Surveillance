@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import accueil, page_depart, get_postes_data, RecevoirDonneesAPIView, login_view, register_view
+from .views import accueil, page_depart, get_postes_data, RecevoirDonneesAPIView, login_view, register_view, dashboard_view
 
 urlpatterns = [
     path('accueil/', accueil, name='accueil'),  # URL pour la page d'accueil
@@ -8,4 +8,5 @@ urlpatterns = [
     path('api/recevoir-donnees/', RecevoirDonneesAPIView.as_view(), name='recevoir-donnees'),
     path('login/', login_view, name='login'),
     path('register/', register_view, name='register'),
+    path('dashboard/', dashboard_view, name='dashboard'),
 ]

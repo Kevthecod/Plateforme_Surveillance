@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect
+import json
+from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
@@ -20,7 +22,7 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect('page_depart')  # Redirection après connexion
+            return redirect('dashboard')  # Redirection après connexion
         else:
             messages.error(request, "Nom d'utilisateur ou mot de passe incorrect")
     else:
@@ -33,7 +35,7 @@ def register_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user)  # Connecte l'utilisateur après inscription
-            return redirect('page_depart')  # Redirection après inscription
+            return redirect('dashboard')  # Redirection après inscription
         else:
             messages.error(request, "Erreur lors de l'inscription. Vérifiez les champs.")
     else:
@@ -58,7 +60,7 @@ def accueil(request, *args, **kwargs):
 
 @login_required
 def page_depart(request):
-    return render(request, 'page_depart.html') 
+    return render(request, 'dashboard.html') 
 
 @api_view(['GET'])
 def get_postes_data(request):
@@ -147,4 +149,23 @@ class RecevoirDonneesAPIView(APIView):
             {"detail": "Données enregistrées avec succès."},
             status=status.HTTP_201_CREATED
         )
+    
 
+def dashboard_view(request):
+    postes_sources = PosteSource.objects.prefetch_related('departs__transformateurs').all()
+
+    # Construire les données JSON pour les départs et transformateurs
+    transformateurs_data = {
+        depart.id: [
+            {"id": transformateur.id, "code": transformateur.code_poste}
+            for transformateur in depart.transformateurs.all()
+        ]
+        for poste in postes_sources
+        for depart in poste.departs.all()
+    }
+
+    context = {
+        "postes_sources": postes_sources,
+        "transformateurs_data": json.dumps(transformateurs_data)  # Sérialisation JSON
+    }
+    return render(request, "dashboard.html", context)
