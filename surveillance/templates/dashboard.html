@@ -25,6 +25,9 @@
             height: 100%;
             overflow-y: auto;
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            left: 0;
+            top: 65px;
         }
         .header {
             position: fixed;
@@ -32,9 +35,13 @@
             left: 0;
             width: 100%;
             height: 65px;
-            z-index: 999;
+            z-index: 10;
             background-color: #009fff;
-            color: rgb(255 255 255);
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
         }
         .sidebar h3 {
             text-align: center;
@@ -42,16 +49,13 @@
             font-size: 20px;
             margin-bottom: 20px;
         }
-
         .sidebar ul {
             list-style-type: none;
             padding: 0;
         }
-
         .sidebar li {
             margin-bottom: 10px;
         }
-
         .sidebar button {
             width: 100%;
             text-align: left;
@@ -63,42 +67,33 @@
             cursor: pointer;
             border-radius: 5px;
         }
-
         .sidebar button:hover {
             background: #0056b3;
         }
-
-        /* Main Content */
         .content {
             flex-grow: 1;
-            padding: 50px;
+            margin-left: 250px;
+            margin-top: 65px;
+            padding: 20px;
             background-color: #f9f9f9;
-            /* overflow-y: auto; */
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
-            margin-left: 260px; /* Décale le contenu principal à droite du sidebar */
-
+            height: calc(100vh - 65px);
+            overflow-y: auto;
         }
-
         h1, h3 {
             color: #333;
         }
-
         #section-title {
             text-align: center;
             font-size: 24px;
             margin-bottom: 20px;
             color: #007BFF;
         }
-
-        /* Transformateurs */
         .transformateurs {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 20px;
-            margin-top: 30px;
+            padding: 20px;
         }
-
         .transformateurs button {
             padding: 20px 25px;
             background: #28a745;
@@ -108,77 +103,66 @@
             cursor: pointer;
             font-size: 18px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
+            width: 100%;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
         }
-
         .transformateurs button:hover {
             background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
         }
-
-        /* Responsivité */
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 200px;
-                padding: 15px;
-            }
-
-            .content {
-                padding: 20px;
-            }
-
-            .transformateurs button {
-                font-size: 16px;
-                padding: 15px 20px;
-            }
+        .transformateurs p {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: #666;
+            font-size: 16px;
         }
-
-        @media (max-width: 480px) {
-            .sidebar {
-                width: 100%;
-                height: auto;
-                box-shadow: none;
-            }
-
-            .content {
-                padding: 15px;
-            }
-
-            .transformateurs button {
-                font-size: 14px;
-                padding: 12px 18px;
-            }
-
-            .transformateurs {
-                gap: 10px;
-            }
+        
+        /* Style pour les sous-menus des départs */
+        .sidebar ul ul {
+            margin-top: 10px;
+            margin-bottom: 15px;
         }
-
+        
+        .sidebar ul ul button {
+            background: #5a6268;
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+        
+        .sidebar ul ul button:hover {
+            background: #45494d;
+        }
     </style>
 </head>
 <body>
-    <div class = "container-fluid">
-        <header class=" d-flex justify-content-between align-items-center p-3 mb-0 header">
+    <div class="container-fluid">
+        <header class="header">
             <div>
                 <img src="{% static 'image/Logo-SBEE.png' %}" alt="Logo SBEE" class="logo">
             </div>
             <div>
-                <h2 class="mb-0 title text-center">INTERFACE DE SUPERVISION</h2>
+                <h2 class="mb-0">INTERFACE DE SUPERVISION</h2>
             </div>
             <div>
                 <nav>
-                    <ul class="nav ">
+                    <ul class="nav">
                         <li class="nav-item">
                             <a class="nav-link text-white fs-5" href="{% url 'accueil' %}">Accueil</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white fs-5" href="#depart">départ</a>
+                            <a class="nav-link text-white fs-5" href="#depart">Départ</a>
                         </li>
                     </ul>
                 </nav>
             </div>
         </header>
-
-        <nav class ="sidebar">  
+        <nav class="sidebar">
             <h3>Postes Sources</h3>
             <ul>
                 {% for poste in postes_sources %}
@@ -200,47 +184,29 @@
                 {% endfor %}
             </ul>
         </nav>
-
-        <div class="content">
+        <main class="content">
             <h1 id="section-title">Sélectionnez un départ</h1>
             <div id="transformateurs-container" class="transformateurs">
-                <!-- Les transformateurs apparaîtront ici -->
                 <p>Aucun transformateur à afficher.</p>
             </div>
-        </div>
+        </main>
     </div>
-    <footer class="fixed-bottom text-white">
-        <div class="row">
-            <div class="col bg-success p-1"></div>
-            <div class="col bg-warning"></div>
-            <div class="col bg-danger"></div>
-        </div>
-        <div class="text-center p-3" style="background-color:#313131;">
-            UAC-EPAC © 2024 Copyright DEV
-        </div>
-    </footer>
     <script>
-        // Vérifie que les données sont chargées correctement
         const transformateursData = JSON.parse('{{ transformateurs_data|escapejs }}');
-        console.log("Données des transformateurs :", transformateursData);
 
-        // Fonction pour afficher ou masquer les départs
         function toggleDepart(id) {
             const element = document.getElementById(id);
             element.style.display = element.style.display === 'none' ? 'block' : 'none';
         }
 
-        // Fonction pour afficher les transformateurs associés à un départ
         function showTransformateurs(departId, departNom) {
             const transformateurs = transformateursData[departId] || [];
             const container = document.getElementById('transformateurs-container');
             const title = document.getElementById('section-title');
 
-            // Mettre à jour le titre
             title.innerText = `Transformateurs pour le départ : ${departNom}`;
-
-            // Mettre à jour le contenu
             container.innerHTML = '';
+
             if (transformateurs.length > 0) {
                 transformateurs.forEach(transformateur => {
                     const button = document.createElement('button');
@@ -261,7 +227,6 @@
             });
         });
 
-        // Fonction pour afficher les détails d'un transformateur
         function showTransformateurDetails(id) {
             alert(`Détails pour le transformateur ID: ${id}`);
         }
